@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Comfortaa } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import Image from "next/image";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+import logo from "@/public/logo.svg";
+import { CircleUser } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const comfortaa = Comfortaa({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -24,9 +32,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${comfortaa.className} antialiased`}>
+        <header className="mx-auto flex max-w-6xl items-center justify-between px-10 py-5">
+          <Image src={logo} alt="Logo" width={120} height={40} unoptimized />
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-gray-400">Hello, John Doe</p>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="bg-primary grid h-10 w-10 place-items-center rounded-full">
+                <CircleUser className="h-6 w-6 text-white" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Admin</DropdownMenuItem>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>WikiScienta</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
         {children}
       </body>
     </html>
