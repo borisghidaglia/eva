@@ -59,6 +59,9 @@ export default function RootLayout({
           </div>
         </header>
         {children}
+        <footer className="mx-auto flex max-w-6xl items-center justify-center px-10 py-5">
+          <p className="text-sm text-gray-400">© 2025 Scienta Lab</p>
+        </footer>
       </body>
     </html>
   );

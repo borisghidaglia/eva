@@ -6,6 +6,8 @@
 @theme {
   --color-primary: #00a4fb;
   --color-secondary: #00d2fb;
+
+  --text-tiny: 0.625rem; /* 10px */
 }
 
 @layer utilities {

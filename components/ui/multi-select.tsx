@@ -10,6 +10,7 @@ import { CheckIcon, LucideChevronDown } from "lucide-react";
 import { useState } from "react";
 
 import { SelectContent } from "@/components/ui/select";
+import { Tag } from "./tag";
 
 export const MultiSelect = <T extends string>({
   name,
@@ -45,12 +46,9 @@ export const MultiSelect = <T extends string>({
             <p className="h-6 text-xs text-gray-400">{placeholder}</p>
           ) : (
             selected.map((item) => (
-              <li
-                key={item}
-                className="bg-secondary/20 rounded-full px-2 py-1 text-xs text-nowrap"
-              >
-                {item}
-              </li>
+              <Tag key={item} asChild>
+                <li>{item}</li>
+              </Tag>
             ))
           )}
         </ul>
