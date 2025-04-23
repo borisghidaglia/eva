@@ -1,7 +1,7 @@
 import { LucideDownload, LucideEye } from "lucide-react";
 import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
+import { Button, DownloadButton } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,6 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Tag } from "@/components/ui/tag";
 
@@ -170,12 +176,28 @@ export default function Home() {
               </span>
               <div className="flex items-center justify-between">
                 <div className="-ml-2 flex items-center gap-0">
-                  <Button className="h-auto bg-transparent py-2 text-gray-600 shadow-none hover:bg-gray-100 has-[>svg]:px-2">
-                    <LucideEye className="h-4 w-4" />
-                  </Button>
-                  <Button className="h-auto bg-transparent py-2 text-gray-600 shadow-none hover:bg-gray-100 has-[>svg]:px-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button className="h-auto bg-transparent py-2 text-gray-600 shadow-none hover:bg-gray-100 has-[>svg]:px-2">
+                        <LucideEye className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="aspect-[225/297] h-full max-h-[95vh] w-auto max-w-none overflow-hidden p-0 sm:max-w-none">
+                      <DialogTitle className="sr-only">PDF</DialogTitle>
+                      {/* TODO: Why is this not closing on ESC press ? */}
+                      <iframe
+                        src="/example.pdf#toolbar=0"
+                        className="h-full w-full scale-[101.5%] border-none"
+                      ></iframe>
+                    </DialogContent>
+                  </Dialog>
+                  <DownloadButton
+                    name={`${simulation.name}.pdf`}
+                    href="/example.pdf"
+                    className="h-auto bg-transparent py-2 text-gray-600 shadow-none hover:bg-gray-100 has-[>svg]:px-2"
+                  >
                     <LucideDownload className="h-4 w-4" />
-                  </Button>
+                  </DownloadButton>
                 </div>
 
                 <div className="text-tiny text-right text-gray-600 italic">
