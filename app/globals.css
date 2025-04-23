@@ -15,4 +15,18 @@
   .stack > * {
     @apply col-start-1 row-start-1;
   }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@layer base {
+  button {
+    @apply hover:cursor-pointer;
+  }
 }

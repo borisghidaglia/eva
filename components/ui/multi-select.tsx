@@ -35,19 +35,19 @@ export const MultiSelect = <T extends string>({
         }
       }}
     >
-      <SelectTrigger className="flex h-auto w-full flex-col gap-2 rounded-md border border-neutral-200 px-3 py-2 text-sm">
+      <SelectTrigger className="flex h-auto w-full flex-col gap-2 overflow-hidden rounded-md border border-neutral-200 px-3 py-2 text-sm">
         <span className="flex items-center justify-between">
           <p>{name}</p>
           <LucideChevronDown className="h-3 w-3" />
         </span>
-        <ul className="flex items-center gap-1">
+        <ul className="no-scrollbar flex items-center gap-1 overflow-x-auto">
           {selected.length === 0 ? (
             <p className="h-6 text-xs text-gray-400">{placeholder}</p>
           ) : (
             selected.map((item) => (
               <li
                 key={item}
-                className="bg-secondary/20 rounded-full px-2 py-1 text-xs"
+                className="bg-secondary/20 rounded-full px-2 py-1 text-xs text-nowrap"
               >
                 {item}
               </li>
