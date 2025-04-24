@@ -1,11 +1,10 @@
+import { CircleUser, LucideArrowRightFromLine } from "lucide-react";
 import type { Metadata } from "next";
 import { Comfortaa } from "next/font/google";
-import "./globals.css";
-
 import Image from "next/image";
+import Link from "next/link";
 
-import logo from "@/public/logo.svg";
-import { CircleUser, LucideArrowRightFromLine } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+
+import logo from "@/public/logo.svg";
+import "./globals.css";
 
 const comfortaa = Comfortaa({
   subsets: ["latin"],
@@ -35,7 +36,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${comfortaa.className} antialiased`}>
         <header className="mx-auto flex max-w-6xl items-center justify-between px-10 py-5">
-          <Image src={logo} alt="Logo" width={120} height={40} unoptimized />
+          <Link href="/" className="contents">
+            <Image src={logo} alt="Logo" width={120} height={40} unoptimized />
+          </Link>
           <div className="flex items-center gap-4">
             <p className="text-sm text-gray-400">Hello, John Doe</p>
             <DropdownMenu>
@@ -59,9 +62,6 @@ export default function RootLayout({
           </div>
         </header>
         {children}
-        <footer className="mx-auto flex max-w-6xl items-center justify-center px-10 py-5">
-          <p className="text-sm text-gray-400">© 2025 Scienta Lab</p>
-        </footer>
       </body>
     </html>
   );

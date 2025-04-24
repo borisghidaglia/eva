@@ -1,5 +1,6 @@
 import { LucideDownload, LucideEye } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Button, DownloadButton } from "@/components/ui/button";
 import {
@@ -143,12 +144,14 @@ export default function Home() {
                 />
               </CardContent>
               <CardFooter className="px-4">
-                <Button
-                  className="bg-primary hover:bg-primary/90 w-full font-bold"
-                  disabled={domain.button.disabled}
-                >
-                  {domain.button.text}
-                </Button>
+                <Link href="/network-creation" className="contents">
+                  <Button
+                    className="bg-primary hover:bg-primary/90 w-full font-bold"
+                    disabled={domain.button.disabled}
+                  >
+                    {domain.button.text}
+                  </Button>
+                </Link>
               </CardFooter>
             </Card>
           ))}
@@ -209,6 +212,10 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <footer className="mx-auto flex max-w-6xl items-center justify-center px-10 py-5">
+        <p className="text-sm text-gray-400">© 2025 Scienta Lab</p>
+      </footer>
     </main>
   );
 }
