@@ -1,7 +1,7 @@
 "use client";
 
 import * as d3 from "d3";
-import { LucideSend, LucideTable } from "lucide-react";
+import { LucideSend } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -18,6 +18,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
+import { GeneAnnotationTable } from "@/components/GeneAnnotationTable";
 
 type Message = {
   from: "user" | "assistant";
@@ -145,12 +146,10 @@ export default function NetworkCreation() {
       <ResizablePanelGroup className="h-full" direction="horizontal">
         <ResizablePanel defaultSize={0.75}>
           <div className="no-scrollbar max-h-full space-y-5 overflow-y-auto p-10">
-            <div className="rounded-lg border border-gray-200">
+            <div className="aspect-[5/2] rounded-lg border border-gray-200">
               <ForceGraph nodes={nodes} links={links} />
             </div>
-            <div className="boder border-primary grid aspect-[16/9] w-full place-items-center rounded-lg bg-gray-100">
-              <LucideTable className="text-secondary size-10" />
-            </div>
+            <GeneAnnotationTable geneIds={nodes.map((node) => node.id)} />
           </div>
         </ResizablePanel>
         <ResizableHandle />
