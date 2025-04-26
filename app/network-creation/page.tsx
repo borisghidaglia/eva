@@ -1,5 +1,15 @@
 "use client";
 
+import * as d3 from "d3";
+import { LucideSend, LucideTable } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import {
+  ForceGraph,
+  GeneEdge,
+  GeneNode,
+  parseGeneMatrix,
+} from "@/components/ForceGraph";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -8,8 +18,6 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { LucideSend, LucideTable, LucideWaypoints } from "lucide-react";
-import { useState } from "react";
 
 type Message = {
   from: "user" | "assistant";
@@ -22,9 +30,29 @@ const suggestions = [
   "Can you create a gene co-expression network for CD5 and CD6 independently, highlighting all genes in common.",
 ];
 
+const GENE_MATRIX_URL = "/data/gene_correlation_matrix.csv";
+
 export default function NetworkCreation() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const hasMessages = messages.length > 0;
+
+  const [geneData, setGeneData] = useState<null | {
+    nodes: GeneNode[];
+    edges: GeneEdge[];
+  }>(null);
+
+  useEffect(() => {
+    fetch(GENE_MATRIX_URL)
+      .then((res) => res.text())
+      .then((csv) => {
+        const parsed = parseGeneMatrix(csv);
+        setGeneData(parsed);
+      })
+      .catch((err) => {
+        console.error("Error fetching gene matrix:", err);
+      });
+  }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -40,7 +68,7 @@ export default function NetworkCreation() {
     setInput("");
   };
 
-  if (messages.length === 0) {
+  if (!hasMessages) {
     return (
       <div className="mt-20 h-[calc(100vh-80px)]">
         <h1 className="mb-6 text-center text-2xl font-bold">
@@ -97,13 +125,28 @@ export default function NetworkCreation() {
     );
   }
 
+  // Pick 20 random nodes and their edges for the demo
+  let nodes: GeneNode[] = [];
+  let links: GeneEdge[] = [];
+  if (geneData) {
+    nodes = d3.shuffle(geneData.nodes).slice(0, 20);
+    const nodeIds = new Set(nodes.map((n) => n.id));
+    links = geneData.edges.filter(
+      (e) =>
+        typeof e.source === "string" &&
+        typeof e.target === "string" &&
+        nodeIds.has(e.source) &&
+        nodeIds.has(e.target),
+    );
+  }
+
   return (
     <div className="h-[calc(100vh-80px)] overflow-hidden border-t border-gray-200">
       <ResizablePanelGroup className="h-full" direction="horizontal">
         <ResizablePanel defaultSize={0.75}>
           <div className="no-scrollbar max-h-full space-y-5 overflow-y-auto p-10">
-            <div className="boder border-primary grid aspect-[16/9] w-full place-items-center rounded-lg bg-gray-100">
-              <LucideWaypoints className="text-secondary size-10" />
+            <div className="rounded-lg border border-gray-200">
+              <ForceGraph nodes={nodes} links={links} />
             </div>
             <div className="boder border-primary grid aspect-[16/9] w-full place-items-center rounded-lg bg-gray-100">
               <LucideTable className="text-secondary size-10" />
