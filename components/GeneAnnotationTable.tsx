@@ -1,25 +1,24 @@
 "use client";
-
-import * as React from "react";
-import * as d3 from "d3";
 import {
   ColumnDef,
+  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
   SortingState,
-  ColumnFiltersState,
+  useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import * as d3 from "d3";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -50,7 +49,7 @@ export const columns: ColumnDef<GeneAnnotation>[] = [
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        className="data-[state=checked]:bg-primary data-[state=checked]:border-none"
+        className="data-[state=checked]:bg-primary mx-2 border-gray-400 data-[state=checked]:border-none"
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
@@ -61,7 +60,7 @@ export const columns: ColumnDef<GeneAnnotation>[] = [
     ),
     cell: ({ row }) => (
       <Checkbox
-        className="data-[state=checked]:bg-primary data-[state=checked]:border-none"
+        className="data-[state=checked]:bg-primary mx-2 data-[state=checked]:border-none"
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
@@ -132,16 +131,13 @@ export const columns: ColumnDef<GeneAnnotation>[] = [
 ];
 
 export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
-  const [data, setData] = React.useState<GeneAnnotation[]>([]);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [data, setData] = useState<GeneAnnotation[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     d3.dsv(";", "/data/Gene_Annotation.csv").then((csv) => {
       let normalized = csv.map((row) => ({
         "Gene ID": row["Gene ID"] ?? "",
@@ -159,8 +155,6 @@ export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
       setData(normalized);
     });
   }, [geneIds]);
-
-  console.log("data", data);
 
   const table = useReactTable({
     data,
@@ -182,48 +176,28 @@ export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
   });
 
   return (
-    <div className="w-full">
+    <div>
       <div className="flex items-center gap-2 py-4">
         <Input
           placeholder="Filter all columns..."
           value={table.getState().globalFilter ?? ""}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="max-w-sm"
+          className="ml-auto max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto border-gray-200">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
-      <div className="rounded-md border border-gray-200">
+      <div className="overflow-hidden rounded-md border border-gray-200 shadow-lg">
         <Table>
-          <TableHeader>
+          <TableHeader className="text-white">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-gray-200">
+              <TableRow
+                key={headerGroup.id}
+                className="bg-secondary/40 hover:bg-secondary/40"
+              >
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="h-15 font-bold">
+                  <TableHead
+                    key={header.id}
+                    className="h-15 font-bold text-gray-800"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -241,7 +215,7 @@ export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="data-[state=selected]:bg-secondary/10 border-gray-200"
+                  className="data-[state=selected]:bg-secondary/10 hover:bg-secondary/10 border-gray-200"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

@@ -2,7 +2,7 @@
 
 import * as d3 from "d3";
 import { LucideSend } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   ForceGraph,
@@ -54,6 +54,21 @@ export default function NetworkCreation() {
         console.error("Error fetching gene matrix:", err);
       });
   }, []);
+
+  // Memoize picking 20 random nodes and their edges for the demo
+  const { nodes, links } = useMemo(() => {
+    if (!geneData) return { nodes: [], links: [] };
+    const nodes = d3.shuffle([...geneData.nodes]).slice(0, 20);
+    const nodeIds = new Set(nodes.map((n) => n.id));
+    const links = geneData.edges.filter(
+      (e) =>
+        typeof e.source === "string" &&
+        typeof e.target === "string" &&
+        nodeIds.has(e.source) &&
+        nodeIds.has(e.target),
+    );
+    return { nodes, links };
+  }, [geneData]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -123,21 +138,6 @@ export default function NetworkCreation() {
           ))}
         </div>
       </div>
-    );
-  }
-
-  // Pick 20 random nodes and their edges for the demo
-  let nodes: GeneNode[] = [];
-  let links: GeneEdge[] = [];
-  if (geneData) {
-    nodes = d3.shuffle(geneData.nodes).slice(0, 20);
-    const nodeIds = new Set(nodes.map((n) => n.id));
-    links = geneData.edges.filter(
-      (e) =>
-        typeof e.source === "string" &&
-        typeof e.target === "string" &&
-        nodeIds.has(e.source) &&
-        nodeIds.has(e.target),
     );
   }
 

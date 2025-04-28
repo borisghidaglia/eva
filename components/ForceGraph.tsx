@@ -59,14 +59,15 @@ export function ForceGraph({
     gRef.current = g.node();
 
     // Add a line for each link, and a circle for each node.
+    const maxCorrelation = Math.max(...simLinks.map((d) => Math.abs(d.value)));
+
     const link = g
       .append("g")
-      .attr("stroke", "#999")
-      .attr("stroke-opacity", 0.6)
+      .attr("stroke-opacity", 1)
       .selectAll<SVGLineElement, GeneEdge>("line")
       .data(simLinks)
       .join("line")
-      .attr("stroke-width", (d) => 2 + Math.abs(d.value) * 4)
+      .attr("stroke-width", (d) => (Math.abs(d.value) / maxCorrelation) * 5)
       .attr("stroke", (d) => (d.value > 0 ? "#1976d2" : "#d32f2f"));
 
     // Compute node degree (number of neighbors)
@@ -93,14 +94,11 @@ export function ForceGraph({
 
     const node = g
       .append("g")
-      .attr("stroke", "#fff")
-      .attr("stroke-width", 1.5)
       .selectAll<SVGCircleElement, GeneNode>("circle")
       .data(simNodes)
       .join("circle")
       .attr("r", (d) => scaleR(nodeDegree[d.id] || 0))
       .attr("fill", (d) => color(d.group ?? 1));
-
     // Add gene name labels next to each node
     const labels = g
       .append("g")
@@ -108,7 +106,7 @@ export function ForceGraph({
       .data(simNodes)
       .join("text")
       .text((d) => d.id)
-      .attr("font-size", 12)
+      .attr("font-size", 14)
       .attr("dx", 8)
       .attr("dy", 4)
       .attr("fill", "#333");
