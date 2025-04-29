@@ -1,19 +1,10 @@
-import { CircleUser, LucideArrowRightFromLine } from "lucide-react";
 import type { Metadata } from "next";
 import { Comfortaa } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
+import Nav from "@/components/nav";
+import { UserProvider } from "@/components/UserContext";
 import logo from "@/public/logo.svg";
 import "./globals.css";
 
@@ -34,35 +25,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${comfortaa.className} antialiased`}>
-        <header className="mx-auto flex max-w-6xl items-center justify-between px-10 py-5">
-          <Link href="/" className="contents">
-            <Image src={logo} alt="Logo" width={120} height={40} unoptimized />
-          </Link>
-          <div className="flex items-center gap-4">
-            <p className="text-sm text-gray-400">Hello, John Doe</p>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="bg-primary grid h-10 w-10 place-items-center rounded-full">
-                <CircleUser className="h-6 w-6 text-white" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Admin</DropdownMenuItem>
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>WikiScienta</DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Button className="w-full text-xs">
-                    <LucideArrowRightFromLine className="h-2 w-2 text-white" />
-                    Sign out
-                  </Button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </header>
-        {children}
-      </body>
+      <UserProvider>
+        <body className={`${comfortaa.className} antialiased`}>
+          <header className="mx-auto flex max-w-6xl items-center justify-between px-10 py-5">
+            <Link href="/" className="contents">
+              <Image
+                src={logo}
+                alt="Logo"
+                width={120}
+                height={40}
+                unoptimized
+              />
+            </Link>
+            <Nav />
+          </header>
+          {children}
+        </body>
+      </UserProvider>
     </html>
   );
 }
