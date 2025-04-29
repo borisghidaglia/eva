@@ -2,6 +2,7 @@
 
 import * as d3 from "d3";
 import { LucideSend } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -10,6 +11,7 @@ import {
   GeneNode,
   parseGeneMatrix,
 } from "@/components/ForceGraph";
+import { GeneAnnotationTable } from "@/components/GeneAnnotationTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -18,9 +20,8 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { cn } from "@/lib/utils";
-import { GeneAnnotationTable } from "@/components/GeneAnnotationTable";
 
-type Message = {
+export type Message = {
   from: "user" | "assistant";
   text: string;
 };
@@ -34,6 +35,9 @@ const suggestions = [
 const GENE_MATRIX_URL = "/data/gene_correlation_matrix.csv";
 
 export default function NetworkCreation() {
+  const router = useRouter();
+
+  // Chat state
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const hasMessages = messages.length > 0;
@@ -82,6 +86,10 @@ export default function NetworkCreation() {
     if (!input.trim()) return;
     setMessages((prev) => [...prev, { from: "user", text: input }]);
     setInput("");
+  };
+
+  const handleConfirmGenesSelection = (ids: string[]) => {
+    router.push(`/analysis?genes=${ids.join(",")}`);
   };
 
   if (!hasMessages) {
@@ -149,7 +157,10 @@ export default function NetworkCreation() {
             <div className="aspect-[5/2] rounded-lg border border-gray-200">
               <ForceGraph nodes={nodes} links={links} />
             </div>
-            <GeneAnnotationTable geneIds={nodes.map((node) => node.id)} />
+            <GeneAnnotationTable
+              geneIds={nodes.map((node) => node.id)}
+              onConfirmGenesSelection={handleConfirmGenesSelection}
+            />
           </div>
         </ResizablePanel>
         <ResizableHandle />
@@ -190,7 +201,7 @@ export default function NetworkCreation() {
   );
 }
 
-const Message = ({
+export const Message = ({
   from = "user",
   children,
   ...props

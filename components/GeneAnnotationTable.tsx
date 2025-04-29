@@ -77,6 +77,7 @@ export const columns: ColumnDef<GeneAnnotation>[] = [
     accessorKey: "Gene Name",
     header: ({ column }) => (
       <Button
+        className="hover:bg-transparent"
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
@@ -130,7 +131,13 @@ export const columns: ColumnDef<GeneAnnotation>[] = [
   },
 ];
 
-export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
+export function GeneAnnotationTable({
+  geneIds,
+  onConfirmGenesSelection,
+}: {
+  geneIds?: string[];
+  onConfirmGenesSelection: (geneIds: string[]) => void;
+}) {
   const [data, setData] = useState<GeneAnnotation[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -177,13 +184,24 @@ export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
 
   return (
     <div>
-      <div className="flex items-center gap-2 py-4">
+      <div className="flex items-center justify-end gap-2 py-4">
         <Input
           placeholder="Filter all columns..."
           value={table.getState().globalFilter ?? ""}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="ml-auto max-w-sm"
+          className="max-w-sm"
         />
+        <Button
+          className="bg-primary hover:bg-primary/90 font-bold text-white"
+          onClick={() => {
+            const selectedRows = table
+              .getSelectedRowModel()
+              .rows.map((row) => row.original["Gene ID"]);
+            onConfirmGenesSelection(selectedRows);
+          }}
+        >
+          Analyze selection
+        </Button>
       </div>
       <div className="overflow-hidden rounded-md border border-gray-200 shadow-lg">
         <Table>
@@ -216,6 +234,7 @@ export function GeneAnnotationTable({ geneIds }: { geneIds?: string[] } = {}) {
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="data-[state=selected]:bg-secondary/10 hover:bg-secondary/10 border-gray-200"
+                  onClick={() => row.toggleSelected()}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
