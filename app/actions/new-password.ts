@@ -1,6 +1,6 @@
 "use server";
 
-import { client } from "@/lib/cognito";
+import { cognitoClient } from "@/lib/cognito";
 import { getChallengeSessionCookie, setAccessTokenCookie } from "@/lib/cookies";
 import { getSecretHash } from "@/lib/server-utils";
 import {
@@ -38,7 +38,7 @@ export async function newPassword(
     Session: await getChallengeSessionCookie(),
   });
 
-  const res = await client.send(command);
+  const res = await cognitoClient.send(command);
   if (!res.AuthenticationResult || !res.AuthenticationResult.AccessToken)
     return { ok: false, error: new NoAccessTokenError() };
 

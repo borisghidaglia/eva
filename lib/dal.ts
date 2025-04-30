@@ -13,3 +13,11 @@ export const verifySession = cache(async () => {
 
   return user;
 });
+
+const adminWhitelist = ["borisghidaglia+scientalab@gmail.com"];
+
+export const verifyAdminSession = cache(async () => {
+  const user = await verifySession();
+  if (!user.ok || !user.value) redirect("/");
+  if (!adminWhitelist.includes(user.value.email)) redirect("/");
+});

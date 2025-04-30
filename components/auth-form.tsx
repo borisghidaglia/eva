@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 
 import { login } from "@/app/actions/login";
@@ -14,13 +15,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { inviteUser } from "@/app/actions/invite-user";
 
-export function LoginForm({
+export function AuthForm({
   className,
   type = "login",
   ...props
 }: React.ComponentPropsWithoutRef<"div"> & {
-  type?: "login" | "new-password";
+  type?: "login" | "new-password" | "invite";
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -31,6 +33,9 @@ export function LoginForm({
     } else if (type === "new-password") {
       const res = await newPassword(formData);
       if (!res.ok) console.error(res.error);
+    } else {
+      const res = await inviteUser(formData);
+      if (!res.ok) console.error(res.error);
     }
   };
 
@@ -39,12 +44,18 @@ export function LoginForm({
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">
-            {type === "login" ? "Login" : "New Password"}
+            {type === "login"
+              ? "Login"
+              : type === "new-password"
+                ? "New Password"
+                : "Invite"}
           </CardTitle>
           <CardDescription>
             {type === "login"
               ? "Enter your email below to login to your account"
-              : "Enter your new password"}
+              : type === "new-password"
+                ? "Enter your new password"
+                : "Enter an email below to invite a new user"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -60,48 +71,44 @@ export function LoginForm({
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
-                    className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
+              {type === "invite" ? null : (
+                <div className="grid gap-2">
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Password</Label>
+                    <a
+                      href="#"
+                      className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                    >
+                      Forgot your password?
+                    </a>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      name="password"
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="text-muted-foreground absolute top-1/2 right-2 -translate-y-1/2 text-xs"
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
                 </div>
-                <div className="relative">
-                  <Input
-                    name="password"
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                  />
-                  <button
-                    type="button"
-                    tabIndex={-1}
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="text-muted-foreground absolute top-1/2 right-2 -translate-y-1/2 text-xs"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-              </div>
+              )}
               <Button
                 type="submit"
                 className="bg-primary hover:bg-primary/90 w-full font-bold"
               >
                 Login
               </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <a href="#" className="underline underline-offset-4">
-                Sign up
-              </a>
             </div>
           </form>
         </CardContent>

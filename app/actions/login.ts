@@ -1,6 +1,6 @@
 "use server";
 
-import { client } from "@/lib/cognito";
+import { cognitoClient } from "@/lib/cognito";
 import {
   EmailAndPasswordRequiredError,
   LoginDidntRedirectError,
@@ -36,7 +36,7 @@ export async function login(
     },
   });
 
-  const res = await client.send(command);
+  const res = await cognitoClient.send(command);
 
   if (res.ChallengeName === ChallengeNameType.NEW_PASSWORD_REQUIRED) {
     if (res.Session) {
