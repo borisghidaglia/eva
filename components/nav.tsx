@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUser } from "./UserContext";
+import { useUser } from "./user-context";
 import { signOut } from "@/app/actions/sign-out";
 
 export default function Nav() {

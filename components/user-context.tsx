@@ -1,6 +1,6 @@
 "use client";
 
-import { getUser } from "@/app/actions/getUser";
+import { getUser } from "@/app/actions/get-user";
 import { createContext, useContext, useEffect, useState } from "react";
 
 export type User = {

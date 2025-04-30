@@ -10,8 +10,8 @@ import {
   GeneEdge,
   GeneNode,
   parseGeneMatrix,
-} from "@/components/ForceGraph";
-import { GeneAnnotationTable } from "@/components/GeneAnnotationTable";
+} from "@/components/force-graph";
+import { GeneAnnotationTable } from "@/components/gene-annotation-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getUser } from "@/app/actions/getUser";
+import { getUser } from "@/app/actions/get-user";
 
 export default async function MainLayout({
   children,

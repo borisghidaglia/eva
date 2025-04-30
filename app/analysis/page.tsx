@@ -1,6 +1,6 @@
 "use client";
 
-import HeatMap from "@/components/HeatMap";
+import HeatMap from "@/components/heat-map";
 import {
   ResizableHandle,
   ResizablePanel,

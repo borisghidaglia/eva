@@ -1,6 +1,6 @@
 "use server";
 
-import { User } from "@/components/UserContext";
+import { User } from "@/components/user-context";
 import {
   CognitoIdentityProviderClient,
   GetUserCommand,

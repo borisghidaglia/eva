@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Nav from "@/components/nav";
-import { UserProvider } from "@/components/UserContext";
+import { UserProvider } from "@/components/user-context";
 import logo from "@/public/logo.svg";
 import "./globals.css";
 
