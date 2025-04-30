@@ -1,42 +1,38 @@
 "use server";
 
+import { client } from "@/lib/cognito";
+import {
+  EmailAndPasswordRequiredError,
+  LoginDidntRedirectError,
+} from "@/lib/errors";
+import { getSecretHash } from "@/lib/server-utils";
+import { Result } from "@/lib/utils";
 import {
   AuthFlowType,
   ChallengeNameType,
-  CognitoIdentityProviderClient,
   InitiateAuthCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import crypto from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-const client = new CognitoIdentityProviderClient({
-  region: "eu-west-3",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
-
-export async function login(formData: FormData) {
+export async function login(
+  formData: FormData,
+): Promise<Result<void, EmailAndPasswordRequiredError>> {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
-  if (!email || !password) {
-    // TODO: handle error
-    throw new Error("Email and password are required");
-  }
+  if (!email || !password)
+    return { ok: false, error: new EmailAndPasswordRequiredError() };
 
-  const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-  const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
-  const secretHash = getSecretHash(email, clientId, clientSecret);
+  const secretHash = getSecretHash(email);
+  if (!secretHash.ok) return { ok: false, error: secretHash.error };
 
   const command = new InitiateAuthCommand({
-    ClientId: clientId,
+    ClientId: process.env.AWS_COGNITO_CLIENT_ID!,
     AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
     AuthParameters: {
       USERNAME: email,
       PASSWORD: password,
-      SECRET_HASH: secretHash,
+      SECRET_HASH: secretHash.value,
     },
   });
 
@@ -74,21 +70,6 @@ export async function login(formData: FormData) {
     );
     redirect("/");
   }
-}
 
-// https://docs.aws.amazon.com/cognito/latest/developerguide/signing-up-users-in-your-app.html#cognito-user-pools-computing-secret-hash
-function getSecretHash(
-  username: string,
-  clientId: string,
-  clientSecret: string,
-) {
-  if (!clientSecret) {
-    throw new Error(
-      "AWS_COGNITO_CLIENT_SECRET environment variable is not set",
-    );
-  }
-  return crypto
-    .createHmac("sha256", clientSecret)
-    .update(username + clientId)
-    .digest("base64");
+  return { ok: false, error: new LoginDidntRedirectError() };
 }

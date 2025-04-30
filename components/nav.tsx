@@ -16,7 +16,6 @@ import { signOut } from "@/app/actions/sign-out";
 
 export default function Nav() {
   const user = useUser();
-  console.log({ user });
 
   return (
     <div className="flex items-center gap-4">

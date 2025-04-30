@@ -1,34 +1,27 @@
 "use server";
 
 import { User } from "@/components/user-context";
-import {
-  CognitoIdentityProviderClient,
-  GetUserCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
-import { cookies } from "next/headers";
+import { client, NoUserAttributesError } from "@/lib/cognito";
+import { getAccessTokenCookie } from "@/lib/cookies";
+import { Result } from "@/lib/utils";
+import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 
-const client = new CognitoIdentityProviderClient({
-  region: "eu-west-3",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-  },
-});
+export async function getUser(): Promise<
+  Result<User | null, NoUserAttributesError>
+> {
+  const accessToken = await getAccessTokenCookie();
+  if (!accessToken) return { ok: true, value: null };
 
-export async function getUser(): Promise<User | null> {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("aws-cognito-access-token")?.value;
-
-  if (!accessToken) return null;
-
-  const command = new GetUserCommand({
-    AccessToken: accessToken,
-  });
+  const command = new GetUserCommand({ AccessToken: accessToken });
   const res = await client.send(command);
+  if (!res.UserAttributes)
+    return { ok: false, error: new NoUserAttributesError() };
 
   return {
-    id: res.UserAttributes?.find((attr) => attr.Name === "sub")?.Value || "",
-    email:
-      res.UserAttributes?.find((attr) => attr.Name === "email")?.Value || "",
+    ok: true,
+    value: {
+      id: res.UserAttributes.find((a) => a.Name === "sub")?.Value || "",
+      email: res.UserAttributes.find((a) => a.Name === "email")?.Value || "",
+    },
   };
 }

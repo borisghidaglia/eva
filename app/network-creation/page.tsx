@@ -14,17 +14,12 @@ import {
 import { GeneAnnotationTable } from "@/components/gene-annotation-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Message } from "@/components/ui/message";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { cn } from "@/lib/utils";
-
-export type Message = {
-  from: "user" | "assistant";
-  text: string;
-};
 
 const suggestions = [
   "Can you create a gene association network for CD5, including only the 20 most co-expressed genes.",
@@ -200,21 +195,3 @@ export default function NetworkCreation() {
     </div>
   );
 }
-
-export const Message = ({
-  from = "user",
-  children,
-  ...props
-}: React.ComponentProps<"p"> & { from: "assistant" | "user" }) => {
-  return (
-    <p
-      className={cn(
-        "max-w-prose rounded-lg p-2 text-xs",
-        from === "user" ? "bg-secondary/20 self-end" : "self-start bg-gray-200",
-      )}
-      {...props}
-    >
-      {children}
-    </p>
-  );
-};

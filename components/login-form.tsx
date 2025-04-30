@@ -23,6 +23,17 @@ export function LoginForm({
   type?: "login" | "new-password";
 }) {
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (formData: FormData) => {
+    if (type === "login") {
+      const res = await login(formData);
+      if (!res.ok) console.error(res.error);
+    } else if (type === "new-password") {
+      const res = await newPassword(formData);
+      if (!res.ok) console.error(res.error);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -37,7 +48,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={type === "login" ? login : newPassword}>
+          <form action={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

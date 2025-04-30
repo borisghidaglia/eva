@@ -7,9 +7,9 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { use, useState } from "react";
-import { Message } from "../network-creation/page";
 import { Button } from "@/components/ui/button";
 import { LucideSend } from "lucide-react";
+import { Message } from "@/components/ui/message";
 
 export default function AnalysisPage({
   searchParams,

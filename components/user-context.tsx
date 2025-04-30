@@ -3,11 +3,7 @@
 import { getUser } from "@/app/actions/get-user";
 import { createContext, useContext, useEffect, useState } from "react";
 
-export type User = {
-  id: string;
-  email: string;
-  // Add other user fields as needed
-};
+export type User = { id: string; email: string };
 
 export const UserContext = createContext<User | null>(null);
 
@@ -16,14 +12,16 @@ export const useUser = () => useContext(UserContext);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
-  console.log("provider", { user });
-
   useEffect(() => {
     getUser()
-      .then(setUser)
+      .then((res) => {
+        if (res.ok) return setUser(res.value);
+        console.error(res.error);
+        setUser(null);
+      })
       .catch((error) => {
         console.error("Error fetching user:", error);
-        setUser(null); // Set user to null if there's an error
+        setUser(null); // Set user to null if there's an unexpected error
       });
   }, []);
 
