@@ -9,7 +9,7 @@ export const verifySession = cache(async () => {
   const user = await getUser();
   // if (error) console.error("Error fetching user:", error);
 
-  if (!user) redirect("/login");
+  if (!user) redirect("/sign-in");
 
   return user;
 });

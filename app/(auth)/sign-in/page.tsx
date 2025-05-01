@@ -1,9 +1,9 @@
-import { AuthForm } from "@/components/auth-form";
+import { SignInForm } from "@/components/auth-forms";
 
 export default function Page() {
   return (
     <div className="mx-auto mt-35 w-full max-w-sm">
-      <AuthForm type="new-password" />
+      <SignInForm />
     </div>
   );
 }

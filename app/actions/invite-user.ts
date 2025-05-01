@@ -1,21 +1,17 @@
 "use server";
 
 import { AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { randomBytes } from "crypto";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 import { cognitoClient } from "@/lib/cognito";
+import { dynamodbClient, invitationTokensTable } from "@/lib/dynamodb";
 import {
   EmailRequiredError,
   FailedToCreateUserError,
   FailedToStoreTokenInDbError,
 } from "@/lib/errors";
+import { getNewInvitationToken } from "@/lib/invitation-token";
 import { Result } from "@/lib/utils";
-import {
-  dynamodbClient,
-  InvitationToken,
-  invitationTokensTable,
-} from "@/lib/dynamodb";
 
 export async function inviteUser(
   formData: FormData,
@@ -51,17 +47,7 @@ export async function inviteUser(
     return { ok: false, error: new FailedToCreateUserError(message) };
   }
 
-  // Generate a unique token for the invitation link
-  const token = randomBytes(32).toString("hex");
-  const expirationTime = new Date();
-  expirationTime.setHours(expirationTime.getHours() + 24); // 24 hour expiration
-
-  const invitationToken: InvitationToken = {
-    token: token,
-    email: email,
-    expiresAt: expirationTime.getTime(),
-    used: false,
-  };
+  const invitationToken = getNewInvitationToken(email);
   const storeTokenCommand = new PutCommand({
     TableName: invitationTokensTable,
     Item: invitationToken,
@@ -73,7 +59,7 @@ export async function inviteUser(
     return { ok: false, error: new FailedToStoreTokenInDbError() };
   }
 
-  const invitationLink = `/invite/${token}`;
+  const invitationLink = `/invite/${invitationToken.token}`;
   // TODO: Send the invitation email
   // await sendInvitationEmail(email, invitationLink);
   console.log(`Invitation link: ${invitationLink}`);

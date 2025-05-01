@@ -1,9 +1,9 @@
-import { AuthForm } from "@/components/auth-form";
+import { InviteForm } from "@/components/auth-forms";
 
-export default function InvitePage() {
+export default async function InvitePage() {
   return (
     <div className="mx-auto mt-35 w-full max-w-sm">
-      <AuthForm type="invite" />
+      <InviteForm />
     </div>
   );
 }

@@ -4,5 +4,4 @@
 
 ### InvitationTokens
 
-Partition key: token (type: String)  
-Sort key: email (type: String)
+Partition key: token (type: String)

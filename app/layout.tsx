@@ -4,7 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 
 import Nav from "@/components/nav";
+import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/components/user-context";
+
 import logo from "@/public/logo.svg";
 import "./globals.css";
 
@@ -40,6 +42,10 @@ export default function RootLayout({
             <Nav />
           </header>
           {children}
+          <Toaster
+            closeButton
+            className="[&_[data-close-button]]:top-3.5! [&_[data-close-button]]:right-0! [&_[data-close-button]]:left-auto!"
+          />
         </body>
       </UserProvider>
     </html>
