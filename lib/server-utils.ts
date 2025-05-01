@@ -1,6 +1,10 @@
 import "server-only";
 
 import crypto from "crypto";
+import {
+  AWS_COGNITO_CLIENT_ID,
+  AWS_COGNITO_CLIENT_SECRET,
+} from "./taintedEnvVar";
 import { Result } from "./utils";
 
 export class MissingClientSecretOrClientIdError extends Error {}
@@ -9,8 +13,8 @@ export class MissingClientSecretOrClientIdError extends Error {}
 export function getSecretHash(
   username: string,
 ): Result<string, MissingClientSecretOrClientIdError> {
-  const clientId = process.env.AWS_COGNITO_CLIENT_ID!;
-  const clientSecret = process.env.AWS_COGNITO_CLIENT_SECRET!;
+  const clientId = AWS_COGNITO_CLIENT_ID;
+  const clientSecret = AWS_COGNITO_CLIENT_SECRET;
 
   if (!clientSecret || !clientId)
     return {

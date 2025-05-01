@@ -7,6 +7,7 @@ import {
   SignInFailedError,
 } from "@/lib/errors";
 import { getSecretHash } from "@/lib/server-utils";
+import { AWS_COGNITO_CLIENT_ID } from "@/lib/taintedEnvVar";
 import { Result } from "@/lib/utils";
 import {
   AuthFlowType,
@@ -27,7 +28,7 @@ export async function signIn(
   if (!secretHash.ok) return { ok: false, error: secretHash.error };
 
   const command = new InitiateAuthCommand({
-    ClientId: process.env.AWS_COGNITO_CLIENT_ID!,
+    ClientId: AWS_COGNITO_CLIENT_ID,
     AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
     AuthParameters: {
       USERNAME: email,

@@ -14,6 +14,7 @@ import {
 } from "@/lib/errors";
 import { getUserEmailFromInvitationToken } from "@/lib/invitation-token";
 import { getSecretHash } from "@/lib/server-utils";
+import { AWS_COGNITO_USER_POOL_ID } from "@/lib/taintedEnvVar";
 import { Result } from "@/lib/utils";
 import { AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
@@ -54,7 +55,7 @@ export async function signUp(
     Password: password,
     Permanent: true,
     Username: email,
-    UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID!,
+    UserPoolId: AWS_COGNITO_USER_POOL_ID,
   });
 
   try {
