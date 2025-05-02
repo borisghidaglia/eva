@@ -18,7 +18,6 @@ import { AWS_COGNITO_USER_POOL_ID } from "@/lib/taintedEnvVar";
 import { Result } from "@/lib/utils";
 import { AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { redirect } from "next/navigation";
 
 export async function signUp(
   token: string,
@@ -82,5 +81,5 @@ export async function signUp(
     return { ok: false, error: new FailedToSetInvitationTokenAsUsed(message) };
   }
 
-  redirect("/sign-in");
+  return { ok: true, value: undefined };
 }

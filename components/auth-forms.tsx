@@ -1,9 +1,13 @@
 "use client";
 
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import { inviteUser } from "@/app/actions/invite-user";
 import { signIn } from "@/app/actions/sign-in";
 import { signUp } from "@/app/actions/sign-up";
+import useHasMounted from "@/app/hooks/use-has-mounted";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,9 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { inviteUser } from "@/app/actions/invite-user";
-import { toast } from "sonner";
-import useHasMounted from "@/app/hooks/use-has-mounted";
 
 export function SignInForm({
   className,
@@ -115,6 +116,16 @@ export function SignUpForm({
   const handleSubmit = async (formData: FormData) => {
     const res = await signUp(props.token, formData);
     if (!res.ok) toast.error(res.error.message, { duration: Infinity });
+    else {
+      toast.success(
+        <p>
+          Account created successfully!
+          <br />
+          You can now sign in.
+        </p>,
+      );
+      redirect("/sign-in");
+    }
   };
 
   return (
@@ -181,7 +192,8 @@ export function InviteForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const handleSubmit = async (formData: FormData) => {
     const res = await inviteUser(formData);
-    if (!res.ok) console.error(res.error);
+    if (!res.ok) toast.error(res.error.message);
+    else toast.success("User invited successfully!");
   };
 
   return (

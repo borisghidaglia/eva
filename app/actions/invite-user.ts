@@ -22,7 +22,10 @@ export async function inviteUser(
 ): Promise<
   Result<
     string,
-    EmailRequiredError | FailedToCreateUserError | FailedToStoreTokenInDbError
+    | EmailRequiredError
+    | FailedToCreateUserError
+    | FailedToStoreTokenInDbError
+    | FailedToSendInviteEmail
   >
 > {
   const email = formData.get("email")?.toString();

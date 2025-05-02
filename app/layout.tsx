@@ -45,6 +45,8 @@ export default function RootLayout({
           <Toaster
             closeButton
             className="[&_[data-close-button]]:top-3.5! [&_[data-close-button]]:right-0! [&_[data-close-button]]:left-auto!"
+            theme="light"
+            richColors
           />
         </body>
       </UserProvider>
