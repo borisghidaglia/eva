@@ -4,10 +4,8 @@ import { getUserEmailFromInvitationToken } from "@/lib/invitation-token";
 export default async function SignUpPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
-  // Throws an error if not awaited
-  // https://nextjs.org/docs/messages/sync-dynamic-apis
   const { token } = await params;
   const email = await getUserEmailFromInvitationToken(token);
   return (

@@ -59,7 +59,7 @@ export async function signUp(
   });
 
   try {
-    const res = await cognitoClient.send(command);
+    await cognitoClient.send(command);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     return { ok: false, error: new FailedToSetUserPassword(message) };
