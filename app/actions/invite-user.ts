@@ -1,6 +1,7 @@
 "use server";
 
 import { AdminCreateUserCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { SendEmailCommand } from "@aws-sdk/client-ses";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 
 import { cognitoClient } from "@/lib/cognito";
@@ -8,9 +9,11 @@ import { dynamodbClient, invitationTokensTable } from "@/lib/dynamodb";
 import {
   EmailRequiredError,
   FailedToCreateUserError,
+  FailedToSendInviteEmail,
   FailedToStoreTokenInDbError,
 } from "@/lib/errors";
 import { getNewInvitationToken } from "@/lib/invitation-token";
+import { sesClient } from "@/lib/ses";
 import { AWS_COGNITO_USER_POOL_ID } from "@/lib/taintedEnvVar";
 import { Result } from "@/lib/utils";
 
@@ -60,10 +63,30 @@ export async function inviteUser(
     return { ok: false, error: new FailedToStoreTokenInDbError() };
   }
 
-  const invitationLink = `/invite/${invitationToken.token}`;
-  // TODO: Send the invitation email
-  // await sendInvitationEmail(email, invitationLink);
-  console.log(`Invitation link: ${invitationLink}`);
+  const invitationLink = new URL(
+    `/sign-up/${invitationToken.token}`,
+    process.env.NEXT_PUBLIC_ROOT_URL,
+  ).toString();
+
+  const sendEmailCommand = new SendEmailCommand({
+    Source: "julien.duquesne@scientalab.com",
+    Destination: { ToAddresses: [email] },
+    Message: {
+      Subject: { Data: "You've been invited to join Eva" },
+      Body: {
+        Html: {
+          Data: `Click the link below to accept the invitation:<br><br><a href="${invitationLink}">${invitationLink}</a>`,
+        },
+      },
+    },
+  });
+
+  try {
+    await sesClient.send(sendEmailCommand);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return { ok: false, error: new FailedToSendInviteEmail(message) };
+  }
 
   return { ok: true, value: "Email added successfully" };
 }
