@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { Comfortaa } from "next/font/google";
-import Image from "next/image";
-import Link from "next/link";
 
-import Nav from "@/components/nav";
+import { AppHeader } from "@/components/app-header";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/components/user-context";
 
-import logo from "@/public/logo.svg";
 import "./globals.css";
 
 const comfortaa = Comfortaa({
@@ -27,29 +25,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <UserProvider>
-        <body className={`${comfortaa.className} antialiased`}>
-          <header className="mx-auto flex max-w-6xl items-center justify-between px-10 py-5">
-            <Link href="/" className="contents">
-              <Image
-                src={logo}
-                alt="Logo"
-                width={120}
-                height={40}
-                unoptimized
-              />
-            </Link>
-            <Nav />
-          </header>
-          {children}
-          <Toaster
-            closeButton
-            className="[&_[data-close-button]]:top-3.5! [&_[data-close-button]]:right-0! [&_[data-close-button]]:left-auto!"
-            theme="light"
-            richColors
-          />
-        </body>
-      </UserProvider>
+      <body
+        className={`${comfortaa.className} overscroll-none antialiased [--header-height:calc(theme(spacing.20))]`}
+      >
+        <UserProvider>
+          <SidebarProvider className="flex flex-col">
+            <AppHeader />
+            {children}
+          </SidebarProvider>
+        </UserProvider>
+        <Toaster
+          closeButton
+          className="[&_[data-close-button]]:top-3.5! [&_[data-close-button]]:right-0! [&_[data-close-button]]:left-auto!"
+          theme="light"
+          richColors
+        />
+      </body>
     </html>
   );
 }

@@ -100,7 +100,7 @@ const simulations = [
 
 export default function Home() {
   return (
-    <main className="mb-40 space-y-10">
+    <div className="mt-10 mb-40 space-y-10">
       <header className="mx-auto max-w-6xl space-y-4 px-10 pt-6">
         <h1 className="text-2xl font-semibold">Launch a simulation with Eva</h1>
         <p className="max-w-prose text-base text-gray-400">
@@ -144,7 +144,7 @@ export default function Home() {
                 />
               </CardContent>
               <CardFooter className="px-4">
-                <Link href="/network-creation" className="contents">
+                <Link href="/chat" className="contents">
                   <Button
                     className="bg-primary hover:bg-primary/90 w-full font-bold"
                     disabled={domain.button.disabled}
@@ -216,6 +216,6 @@ export default function Home() {
       <footer className="mx-auto flex max-w-6xl items-center justify-center px-10 py-5">
         <p className="text-sm text-gray-400">© 2025 Scienta Lab</p>
       </footer>
-    </main>
+    </div>
   );
 }
