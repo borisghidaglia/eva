@@ -1,7 +1,8 @@
 "use client";
 
-import { getUser } from "@/app/actions/get-user";
 import { createContext, useContext, useEffect, useState } from "react";
+
+import { getUser } from "@/app/actions/get-user";
 
 export type User = { id: string; email: string };
 
@@ -15,8 +16,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     getUser()
       .then((res) => {
-        if (res.ok) return setUser(res.value);
-        console.error(res.error);
+        if (!(res instanceof Error)) return setUser(res);
+        console.error(res.message);
         setUser(null);
       })
       .catch((error) => {

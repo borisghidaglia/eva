@@ -25,6 +25,12 @@ export class FailedToCreateUserError extends Error {
     this.name = "FailedToCreateUserError";
   }
 }
+export class FailedToGetUserError extends Error {
+  constructor(message?: string) {
+    super("Failed to get user. Original error: " + message);
+    this.name = "FailedToGetUserError";
+  }
+}
 export class FailedToSendInviteEmail extends Error {
   constructor(message?: string) {
     super("Failed to send invite email. Original error: " + message);

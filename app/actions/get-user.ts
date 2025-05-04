@@ -3,25 +3,27 @@
 import { User } from "@/components/user-context";
 import { cognitoClient, NoUserAttributesError } from "@/lib/cognito";
 import { getAccessTokenCookie } from "@/lib/cookies";
-import { Result } from "@/lib/utils";
+import { FailedToGetUserError } from "@/lib/errors";
 import { GetUserCommand } from "@aws-sdk/client-cognito-identity-provider";
 
-export async function getUser(): Promise<
-  Result<User | null, NoUserAttributesError>
-> {
+export async function getUser() {
   const accessToken = await getAccessTokenCookie();
-  if (!accessToken) return { ok: true, value: null };
+  if (!accessToken) return null;
 
   const command = new GetUserCommand({ AccessToken: accessToken });
-  const res = await cognitoClient.send(command);
-  if (!res.UserAttributes)
-    return { ok: false, error: new NoUserAttributesError() };
+
+  let res;
+  try {
+    res = await cognitoClient.send(command);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return new FailedToGetUserError(message);
+  }
+
+  if (!res.UserAttributes) return new NoUserAttributesError();
 
   return {
-    ok: true,
-    value: {
-      id: res.UserAttributes.find((a) => a.Name === "sub")?.Value || "",
-      email: res.UserAttributes.find((a) => a.Name === "email")?.Value || "",
-    },
-  };
+    id: res.UserAttributes.find((a) => a.Name === "sub")?.Value || "",
+    email: res.UserAttributes.find((a) => a.Name === "email")?.Value || "",
+  } as User;
 }

@@ -7,14 +7,12 @@ export default async function SignUpPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const email = await getUserEmailFromInvitationToken(token);
+  const maybeEmail = await getUserEmailFromInvitationToken(token);
+  const error = maybeEmail instanceof Error ? maybeEmail : undefined;
+  const email = maybeEmail instanceof Error ? undefined : maybeEmail;
   return (
     <div className="mx-auto mt-35 w-full max-w-sm">
-      <SignUpForm
-        token={token}
-        email={email.ok ? email.value : ""}
-        error={email.ok ? undefined : email.error.message}
-      />
+      <SignUpForm token={token} email={email} error={error?.message} />
     </div>
   );
 }

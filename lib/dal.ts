@@ -3,13 +3,13 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 import { cache } from "react";
+
 import { getUser } from "@/app/actions/get-user";
 
 export const verifySession = cache(async () => {
   const user = await getUser();
-  // if (error) console.error("Error fetching user:", error);
-
-  if (!user) redirect("/sign-in");
+  if (user instanceof Error) console.error(user.message);
+  if (user instanceof Error || !user) redirect("/sign-in");
 
   return user;
 });
@@ -22,6 +22,5 @@ const adminWhitelist = [
 
 export const verifyAdminSession = cache(async () => {
   const user = await verifySession();
-  if (!user.ok || !user.value) redirect("/");
-  if (!adminWhitelist.includes(user.value.email)) redirect("/");
+  if (!adminWhitelist.includes(user.email)) redirect("/");
 });

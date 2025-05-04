@@ -13,7 +13,6 @@ import {
   InvitationTokenAlreadyUsedError,
   InvitationTokenExpiredError,
 } from "./errors";
-import { Result } from "./utils";
 
 export const getNewInvitationToken = (email: string) => {
   const token = randomBytes(32).toString("hex");
@@ -28,33 +27,18 @@ export const getNewInvitationToken = (email: string) => {
   };
 };
 
-export const getUserEmailFromInvitationToken = async (
-  token: string,
-): Promise<
-  Result<
-    string,
-    | InvalidInvitationTokenError
-    | InvitationTokenAlreadyUsedError
-    | InvitationTokenExpiredError
-  >
-> => {
-  const invitationToken = await verifyInvitationToken(token);
-  if (!invitationToken.ok) {
-    return { ok: false, error: invitationToken.error };
+export const getUserEmailFromInvitationToken = async (token: string) => {
+  const maybeInvitationToken = await verifyInvitationToken(token);
+  if (maybeInvitationToken instanceof Error) {
+    const error = maybeInvitationToken;
+    return error;
   }
-  return { ok: true, value: invitationToken.value.email };
+
+  const invitationToken = maybeInvitationToken;
+  return invitationToken.email;
 };
 
-async function verifyInvitationToken(
-  token: string,
-): Promise<
-  Result<
-    InvitationToken,
-    | InvalidInvitationTokenError
-    | InvitationTokenAlreadyUsedError
-    | InvitationTokenExpiredError
-  >
-> {
+async function verifyInvitationToken(token: string) {
   const getCommand = new GetCommand({
     TableName: invitationTokensTable,
     Key: { token },
@@ -65,19 +49,17 @@ async function verifyInvitationToken(
     result = await dynamodbClient.send(getCommand);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return { ok: false, error: new ErrorFetchingInvitationToken(message) };
+    return new ErrorFetchingInvitationToken(message);
   }
 
   const invitation = result.Item as InvitationToken;
 
-  if (!invitation)
-    return { ok: false, error: new InvalidInvitationTokenError() };
+  if (!invitation) return new InvalidInvitationTokenError();
 
-  if (invitation.used)
-    return { ok: false, error: new InvitationTokenAlreadyUsedError() };
+  if (invitation.used) return new InvitationTokenAlreadyUsedError();
 
   if (invitation.expiresAt < Date.now())
-    return { ok: false, error: new InvitationTokenExpiredError() };
+    return new InvitationTokenExpiredError();
 
-  return { ok: true, value: invitation };
+  return invitation;
 }

@@ -28,7 +28,7 @@ export function SignInForm({
 
   const handleSubmit = async (formData: FormData) => {
     const res = await signIn(formData);
-    if (!res.ok) toast.error(res.error.message, { duration: Infinity });
+    if (res instanceof Error) toast.error(res.message, { duration: Infinity });
   };
 
   return (
@@ -102,7 +102,7 @@ export function SignUpForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div"> & {
   token: string;
-  email: string;
+  email?: string;
   error?: string;
 }) {
   const hasMounted = useHasMounted();
@@ -115,7 +115,7 @@ export function SignUpForm({
 
   const handleSubmit = async (formData: FormData) => {
     const res = await signUp(props.token, formData);
-    if (!res.ok) toast.error(res.error.message, { duration: Infinity });
+    if (res instanceof Error) toast.error(res.message, { duration: Infinity });
     else {
       toast.success(
         <p>
@@ -192,8 +192,8 @@ export function InviteForm({
 }: React.ComponentPropsWithoutRef<"div">) {
   const handleSubmit = async (formData: FormData) => {
     const res = await inviteUser(formData);
-    if (!res.ok) toast.error(res.error.message);
-    else toast.success("User invited successfully!");
+    if (res instanceof Error) toast.error(res.message);
+    else toast.success(res);
   };
 
   return (

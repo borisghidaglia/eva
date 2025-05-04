@@ -1,5 +1,8 @@
 "use server";
 
+import { AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
+import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
+
 import { cognitoClient } from "@/lib/cognito";
 import { dynamodbClient, invitationTokensTable } from "@/lib/dynamodb";
 import {
@@ -7,48 +10,21 @@ import {
   FailedToSetInvitationTokenAsUsed,
   FailedToSetUserPassword,
   InputEmailDoesnMatchTokenEmail,
-  InvalidInvitationTokenError,
-  InvitationTokenAlreadyUsedError,
-  InvitationTokenExpiredError,
-  NoAccessTokenError,
 } from "@/lib/errors";
 import { getUserEmailFromInvitationToken } from "@/lib/invitation-token";
-import { getSecretHash } from "@/lib/server-utils";
 import { AWS_COGNITO_USER_POOL_ID } from "@/lib/taintedEnvVar";
-import { Result } from "@/lib/utils";
-import { AdminSetUserPasswordCommand } from "@aws-sdk/client-cognito-identity-provider";
-import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
 
-export async function signUp(
-  token: string,
-  formData: FormData,
-): Promise<
-  Result<
-    void,
-    | EmailAndPasswordRequiredError
-    | InputEmailDoesnMatchTokenEmail
-    | InvalidInvitationTokenError
-    | InvitationTokenAlreadyUsedError
-    | InvitationTokenExpiredError
-    | NoAccessTokenError
-    | FailedToSetUserPassword
-    | FailedToSetInvitationTokenAsUsed
-  >
-> {
+export async function signUp(token: string, formData: FormData) {
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
 
-  if (!email || !password)
-    return { ok: false, error: new EmailAndPasswordRequiredError() };
+  if (!email || !password) return new EmailAndPasswordRequiredError();
 
-  const emailFromToken = await getUserEmailFromInvitationToken(token);
-  if (!emailFromToken.ok) return { ok: false, error: emailFromToken.error };
+  const maybeUserEmail = await getUserEmailFromInvitationToken(token);
+  if (maybeUserEmail instanceof Error) return maybeUserEmail;
 
-  if (email !== emailFromToken.value)
-    return { ok: false, error: new InputEmailDoesnMatchTokenEmail() };
-
-  const secretHash = getSecretHash(email);
-  if (!secretHash.ok) return { ok: false, error: secretHash.error };
+  const emailFromToken = maybeUserEmail;
+  if (email !== emailFromToken) return new InputEmailDoesnMatchTokenEmail();
 
   const command = new AdminSetUserPasswordCommand({
     Password: password,
@@ -61,7 +37,7 @@ export async function signUp(
     await cognitoClient.send(command);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return { ok: false, error: new FailedToSetUserPassword(message) };
+    return new FailedToSetUserPassword(message);
   }
 
   // Mark invitation token as used
@@ -78,8 +54,6 @@ export async function signUp(
     await dynamodbClient.send(updateTokenCommand);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return { ok: false, error: new FailedToSetInvitationTokenAsUsed(message) };
+    return new FailedToSetInvitationTokenAsUsed(message);
   }
-
-  return { ok: true, value: undefined };
 }

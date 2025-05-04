@@ -15,21 +15,10 @@ import {
 import { getNewInvitationToken } from "@/lib/invitation-token";
 import { sesClient } from "@/lib/ses";
 import { AWS_COGNITO_USER_POOL_ID } from "@/lib/taintedEnvVar";
-import { Result } from "@/lib/utils";
 
-export async function inviteUser(
-  formData: FormData,
-): Promise<
-  Result<
-    string,
-    | EmailRequiredError
-    | FailedToCreateUserError
-    | FailedToStoreTokenInDbError
-    | FailedToSendInviteEmail
-  >
-> {
+export async function inviteUser(formData: FormData) {
   const email = formData.get("email")?.toString();
-  if (!email) return { ok: false, error: new EmailRequiredError() };
+  if (!email) return new EmailRequiredError();
 
   const createUserCommand = new AdminCreateUserCommand({
     UserPoolId: AWS_COGNITO_USER_POOL_ID,
@@ -51,7 +40,7 @@ export async function inviteUser(
     await cognitoClient.send(createUserCommand);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return { ok: false, error: new FailedToCreateUserError(message) };
+    return new FailedToCreateUserError(message);
   }
 
   const invitationToken = getNewInvitationToken(email);
@@ -63,7 +52,7 @@ export async function inviteUser(
   try {
     await dynamodbClient.send(storeTokenCommand);
   } catch {
-    return { ok: false, error: new FailedToStoreTokenInDbError() };
+    return new FailedToStoreTokenInDbError();
   }
 
   const invitationLink = new URL(
@@ -88,8 +77,8 @@ export async function inviteUser(
     await sesClient.send(sendEmailCommand);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    return { ok: false, error: new FailedToSendInviteEmail(message) };
+    return new FailedToSendInviteEmail(message);
   }
 
-  return { ok: true, value: "Email added successfully" };
+  return "User invited successfully!" as const;
 }
