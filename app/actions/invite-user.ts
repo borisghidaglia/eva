@@ -14,7 +14,6 @@ import {
 } from "@/lib/errors";
 import { getNewInvitationToken } from "@/lib/invitation-token";
 import { sesClient } from "@/lib/ses";
-import { AWS_COGNITO_USER_POOL_ID } from "@/lib/taintedEnvVar";
 import { Result } from "@/lib/utils";
 
 export async function inviteUser(
@@ -32,7 +31,7 @@ export async function inviteUser(
   if (!email) return { ok: false, error: new EmailRequiredError() };
 
   const createUserCommand = new AdminCreateUserCommand({
-    UserPoolId: AWS_COGNITO_USER_POOL_ID,
+    UserPoolId: process.env.AWS_COGNITO_USER_POOL_ID!,
     Username: email,
     UserAttributes: [
       {
