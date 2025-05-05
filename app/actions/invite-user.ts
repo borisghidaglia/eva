@@ -72,7 +72,7 @@ export async function inviteUser(
   ).toString();
 
   const sendEmailCommand = new SendEmailCommand({
-    Source: "julien.duquesne@scientalab.com",
+    Source: "no-reply@scientalab.com",
     Destination: { ToAddresses: [email] },
     Message: {
       Subject: { Data: "You've been invited to join Eva" },
