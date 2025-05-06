@@ -1,7 +1,8 @@
 "use client";
 
 import { LucideBox, LucideInbox, LucideSend } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useChat } from "@ai-sdk/react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { GeneEdge, GeneNode, StaticForceGraph } from "@/components/force-graph";
 
 const suggestions = [
   "Can you create a gene association network for CD5, including only the 20 most co-expressed genes.",
@@ -20,8 +22,17 @@ const suggestions = [
 
 export default function ChatPage() {
   // Chat state
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
+  const { messages, input, handleSubmit, append, setInput } = useChat({
+    maxSteps: 5,
+
+    // run client-side tools that are automatically executed:
+    async onToolCall({ toolCall }) {
+      if (toolCall.toolName === "getLocation") {
+        const cities = ["New York", "Los Angeles", "Chicago", "San Francisco"];
+        return cities[Math.floor(Math.random() * cities.length)];
+      }
+    },
+  });
   const hasMessages = messages.length > 0;
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -31,12 +42,7 @@ export default function ChatPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent | React.KeyboardEvent) => {
-    e.preventDefault?.();
-    if (!input.trim()) return;
-    setMessages((prev) => [...prev, { from: "user", text: input }]);
-    setInput("");
-  };
+  console.log(messages);
 
   return (
     <div className="grid h-[calc(100vh-80px)] grid-rows-[1fr_auto]">
@@ -58,13 +64,7 @@ export default function ChatPage() {
                 <Card
                   key={idx}
                   className="grid max-w-sm cursor-pointer place-items-center py-0 shadow-lg transition-transform"
-                  onClick={() => {
-                    setMessages((prev) => [
-                      ...prev,
-                      { from: "user", text },
-                      { from: "assistant", text: "Here we go!" },
-                    ]);
-                  }}
+                  onClick={() => append({ role: "user", content: text })}
                 >
                   <CardContent className="stack h-full px-0 py-0">
                     <p className="p-5 text-sm">{text}</p>
@@ -81,11 +81,70 @@ export default function ChatPage() {
           </div>
         ) : (
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 pt-4 pb-4">
-            {messages.map((msg, idx) => (
-              <Message key={idx} from={msg.from}>
-                {msg.text}
-              </Message>
-            ))}
+            {messages.map((msg) => {
+              return msg.parts.map((part) => {
+                if (part.type === "text")
+                  return (
+                    <Message
+                      key={msg.id}
+                      from={msg.role === "user" ? "user" : "assistant"}
+                    >
+                      {part.text}
+                    </Message>
+                  );
+                if (part.type === "tool-invocation") {
+                  if (part.toolInvocation.toolName !== "generate_network")
+                    return null;
+                  if (
+                    part.toolInvocation.state === "call" ||
+                    part.toolInvocation.state === "partial-call"
+                  ) {
+                    return (
+                      <div
+                        key={part.toolInvocation.toolCallId}
+                        className="bg-secondary/10 grid h-[400px] place-items-center rounded-lg border border-gray-200"
+                      >
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="border-t-primary h-12 w-12 animate-spin rounded-full border-4 border-gray-300" />
+                          <span className="mt-4 text-sm text-gray-500">
+                            Generating network...
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  }
+                  if (part.toolInvocation.state === "result") {
+                    const { nodes, edges } = JSON.parse(
+                      part.toolInvocation.result.content[0].text,
+                    );
+
+                    return (
+                      <div
+                        key={part.toolInvocation.toolCallId}
+                        className="h-[400px] rounded-lg border border-gray-200"
+                      >
+                        <StaticForceGraph
+                          nodes={
+                            nodes.map((n: number, idx: number) => ({
+                              id: n,
+                              idx,
+                              group: 1,
+                            })) as GeneNode[]
+                          }
+                          links={
+                            edges.map((e: any) => ({
+                              ...e,
+                              value: e.weight,
+                            })) as GeneEdge[]
+                          }
+                        />
+                      </div>
+                    );
+                  }
+                }
+                return null;
+              });
+            })}
           </div>
         )}
       </div>

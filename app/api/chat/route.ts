@@ -1,0 +1,35 @@
+import { openai } from "@ai-sdk/openai";
+import { streamText } from "ai";
+import { z } from "zod";
+import { experimental_createMCPClient as createMCPClient } from "ai";
+
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30;
+
+const mcpClient = await createMCPClient({
+  transport: {
+    type: "sse",
+    url: "http://34.147.25.74:8000/sse",
+
+    // optional: configure HTTP headers, e.g. for authentication
+    // headers: {
+    //   Authorization: "Bearer my-api-key",
+    // },
+  },
+});
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  const result = streamText({
+    model: openai("gpt-4o"),
+    maxRetries: 1,
+    maxSteps: 1,
+    messages,
+    tools: await mcpClient.tools(),
+    system:
+      "When you call tools, their result will be automatically displayed to the user. Do not repeat them to the user. Instead, assert that you successfully called the tool and give a bit of context if needed.",
+  });
+
+  return result.toDataStreamResponse();
+}
