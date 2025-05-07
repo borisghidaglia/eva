@@ -16,7 +16,6 @@ import {
 const suggestions = [
   "Can you create a gene association network for CD5, including only the 20 most co-expressed genes.",
   "Can you create a gene co-expression network for CD5, CD6 and CD7.",
-  "Can you create a gene co-expression network for CD5 and CD6 independently, highlighting all genes in common.",
 ];
 
 export default function ChatPage() {
@@ -44,25 +43,16 @@ export default function ChatPage() {
   console.log(messages);
 
   return (
-    <div className="grid h-[calc(100vh-80px)] grid-rows-[1fr_auto]">
+    <div className="grid h-full grid-rows-[1fr_auto]">
       <div className="no-scrollbar flex h-full flex-col-reverse overflow-y-auto">
         {!hasMessages ? (
-          <div className="mt-20 h-full">
-            <h1 className="mb-6 text-center text-2xl font-bold">
-              Ask EVA to create a gene regulatory network
-            </h1>
-            <p className="mx-auto max-w-prose text-center text-xs text-gray-500">
-              Access to EVA, our multi-modal model that captures the complexity
-              and variability of the immune system to create your gene
-              regulatory network, and investigate association with clinical
-              outcomes.
-            </p>
-
-            <div className="mx-auto mt-15 flex max-w-6xl flex-wrap justify-center gap-5 self-end">
+          <div className="mx-auto flex max-w-2xl flex-col items-center gap-4">
+            <p>Suggestions by Eva</p>
+            <div className="flex justify-center gap-5">
               {suggestions.map((text, idx) => (
                 <Card
                   key={idx}
-                  className="grid max-w-sm cursor-pointer place-items-center py-0 shadow-lg transition-transform"
+                  className="grid w-1/2 cursor-pointer place-items-center py-0 shadow-none"
                   onClick={() => append({ role: "user", content: text })}
                 >
                   <CardContent className="stack h-full px-0 py-0">
@@ -79,7 +69,7 @@ export default function ChatPage() {
             </div>
           </div>
         ) : (
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 pt-4 pb-4">
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-2 pt-4 pb-4">
             {messages.map((msg) => {
               return msg.parts.map((part) => {
                 if (part.type === "text")
@@ -150,7 +140,7 @@ export default function ChatPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="stack mx-auto my-4 w-full max-w-3xl"
+        className="stack mx-auto my-4 w-full max-w-2xl"
       >
         <textarea
           placeholder="Ask something to Eva"
@@ -195,7 +185,7 @@ const DataFolderPopover = ({ children }: { children: React.ReactNode }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent align="start" className="w-3xl" sideOffset={15}>
+      <PopoverContent align="start" className="w-2xl" sideOffset={15}>
         <div className="p-4">
           <h3 className="text-lg font-semibold">Data Folder</h3>
           <p className="text-sm text-gray-500">
@@ -221,7 +211,7 @@ const PromptGalleryPopover = ({ children }: { children: React.ReactNode }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent align="start" className="w-3xl" sideOffset={15}>
+      <PopoverContent align="start" className="w-2xl" sideOffset={15}>
         <div className="p-4">
           <h3 className="text-lg font-semibold">Prompt Gallery</h3>
           <p className="text-sm text-gray-500">

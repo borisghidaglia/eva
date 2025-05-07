@@ -1,7 +1,10 @@
 import { openai } from "@ai-sdk/openai";
-import { streamText } from "ai";
-import { z } from "zod";
-import { experimental_createMCPClient as createMCPClient } from "ai";
+import {
+  experimental_createMCPClient as createMCPClient,
+  streamText,
+} from "ai";
+
+import { verifySession } from "@/lib/dal";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -18,6 +21,8 @@ const mcpClient = await createMCPClient({
 });
 
 export async function POST(req: Request) {
+  await verifySession();
+
   const { messages } = await req.json();
 
   const result = streamText({
