@@ -1,8 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
 
 // Vibe coded by GPT-4.1 starting from:
 // https://observablehq.com/@d3/force-directed-graph/2
+type ForceGraphProps = {
+  nodes: GeneNode[];
+  links: GeneEdge[];
+};
+
+export const StaticForceGraph = (props: ForceGraphProps) => {
+  const { nodes, links } = useMemo(() => props, []);
+  return <ForceGraph nodes={nodes} links={links} />;
+};
 export function ForceGraph({
   nodes,
   links,

@@ -10,7 +10,6 @@ const mcpClient = await createMCPClient({
   transport: {
     type: "sse",
     url: "http://34.147.25.74:8000/sse",
-
     // optional: configure HTTP headers, e.g. for authentication
     // headers: {
     //   Authorization: "Bearer my-api-key",
@@ -23,6 +22,10 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: openai("gpt-4o"),
+    // https://ai-sdk.dev/docs/ai-sdk-core/tools-and-tool-calling#closing-the-mcp-client
+    // Don't know what we should do here as closing the client seems to prevent subsequent interactions
+    // onFinish: () => mcpClient.close(),
+    // onError: () => mcpClient.close(),
     maxRetries: 1,
     maxSteps: 1,
     messages,

@@ -1,9 +1,9 @@
 "use client";
 
-import { LucideBox, LucideInbox, LucideSend } from "lucide-react";
-import { useMemo, useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import { LucideBox, LucideInbox, LucideSend } from "lucide-react";
 
+import { GeneEdge, GeneNode, StaticForceGraph } from "@/components/force-graph";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Message } from "@/components/ui/message";
@@ -12,7 +12,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { GeneEdge, GeneNode, StaticForceGraph } from "@/components/force-graph";
 
 const suggestions = [
   "Can you create a gene association network for CD5, including only the 20 most co-expressed genes.",
