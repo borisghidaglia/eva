@@ -12,7 +12,7 @@ export const maxDuration = 30;
 const mcpClient = await createMCPClient({
   transport: {
     type: "sse",
-    url: "http://34.147.25.74:8000/sse",
+    url: "https://enigma-mcp-server-452652483423.europe-west4.run.app/sse",
     // optional: configure HTTP headers, e.g. for authentication
     // headers: {
     //   Authorization: "Bearer my-api-key",

@@ -7,10 +7,7 @@ export default function ChatLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider
-      className="flex flex-col"
-      style={{ "--sidebar-width": "11rem" } as React.CSSProperties}
-    >
+    <SidebarProvider className="flex flex-col">
       <div className="flex flex-1">
         <AppSidebar />
         <SidebarInset className="bg-transparent">{children}</SidebarInset>
